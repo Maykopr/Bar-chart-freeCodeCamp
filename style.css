@@ -30,8 +30,7 @@
 
   #canvas {
     border: 1px solid gray;
-    /*   width: 800px;
-    height: 500px; */
+    position: relative;
   }
 
   .bar {
@@ -41,4 +40,19 @@
   .x-axis,
   .y-axis {
     color: var(--color5);
+  }
+
+  .overlay{
+    background-color: var(--color4);
+    position:absolute;
+  }
+
+  #tooltip{
+    background-color: var(--color2);
+    width: 100px;
+    border-radius: 4px;
+    color: var(--color4);
+    padding: 5px;
+    text-align: center;
+    position: absolute;
   }

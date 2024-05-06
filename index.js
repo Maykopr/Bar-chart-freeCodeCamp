@@ -3,6 +3,7 @@ d3.json(
     "https://raw.githubusercontent.com/FreeCodeCamp/ProjectReferenceData/master/GDP-data.json"
 ).then((data) => {
     const years = data.data.map((item) => item[0].substring(0, 4));
+    const yearDate = data.data.map(item => new Date(item[0]));
     const GDP = data.data.map((item) => item[1]);
 
     const margin = { top: 30, left: 40, right: 30, bottom: 30 };
@@ -32,27 +33,27 @@ d3.json(
         .scaleTime()
         .domain([
             new Date(d3.min(years)),
-            new Date(d3.max(years))
+            new Date((parseFloat(d3.max(years)) + 1).toString())
         ])
         .range([0, innerWidth]);
 
-    const xAxis = d3.axisBottom(xScale).ticks(20);
+    const xAxis = d3.axisBottom(xScale);
 
     const yAxisScale = d3
         .scaleLinear()
         .domain([0, d3.max(GDP)])
-        .range([innerHeight, 0]);
+        .rangeRound([innerHeight, 0]);
     const yAxis = d3.axisLeft(yAxisScale);
 
 
     const tooltip = d3
-        .select(".visHolder")
+        .select("#canvas")
         .append("div")
         .attr("id", "tooltip")
         .style("opacity", 0);
 
     const overlay = d3
-        .select(".visHolder")
+        .select("#canvas")
         .append("div")
         .attr("class", "overlay")
         .style("opacity", 0);
@@ -80,47 +81,42 @@ d3.json(
         .append("rect")
 
     //update
+    const barWidth = xScale(new Date(d3.max(years))) / years.length
     svg
-        .attr("width", innerWidth / years.length)
+        .attr("width", barWidth)
         .attr("height", (d) => d)
-        .attr("x", (d, i) => xScale(new Date(data.data[i][0])))
+        .attr("x", (d, i) => xScale(yearDate[i]))
         .attr("y", (d) => outHeight - margin.bottom - d)
         .attr("class", "bar")
         .attr("data-date", (d, i) => data.data[i][0])
         .attr("data-gdp", (d, i) => data.data[i][1])
         .attr("index", (d, i) => i)
         .attr("transform", `translate(${margin.left}, 0)`)
+        .on("mouseover", function (event, d) {
+            const i = this.getAttribute("index");
+            // edita dinamincamente a aparência do card de info
 
-    //remove barras sobrando se os dados da api mudarem
-    svg.exit().remove()
-
-    //addiciona os listeners que controlam as caixas de info
-    svg.on("mouseover", (event, d) => {
-        const i = this.getAttribute("index");
-        // edita dinamincamente a aparencia do card de info
-        overlay
-            .transition()
-            .duration(0)
-            .style("height", d + "px")
-            .style("width", width / 270 + "px")
-            .style("opacity", 0.9)
-            .style("left", (i * width) / 270 + 0 + "px")
-            .style("top", height - d + "px")
-            .style("transform", "translateX(60px)");
-        tooltip.transition().duration(200).style("opacity", 0.9);
-        tooltip
-            .html(
-                years[i] +
-                "<br>" +
-                "$" +
-                GDP[i].toFixed(1).replace(/(\d)(?=(\d{3})+\.)/g, "$1,") +
-                " Billion"
-            )
-            .attr("data-date", data.data[i][0])
-            .style("left", (i * width) / 270 + 30 + "px")
-            .style("top", height - 100 + "px")
-            .style("transform", "translateX(60px)");
-    })
+            overlay
+                .transition()
+                .duration(0)
+                .style("height", d + "px")
+                .style("width", barWidth + "px")
+                .style("opacity", 0.9)
+                .style("left", xScale(yearDate[i]) + "px")
+                .style("top", outHeight - margin.bottom - d + "px")
+                .style("transform", `translateX(${margin.left}px)`);
+            tooltip.transition().duration(200).style("opacity", 0.9);
+            tooltip
+                .html(
+                    `${years[i]}
+                    $${GDP[i].toFixed(1).replace(/(\d)(?=(\d{3})+\.)/g, "$1,")}
+                    Billion`
+                )
+                .attr("data-date", data.data[i][0])
+                .style("left", xScale(yearDate[i]) + "px")
+                .style("top", outHeight / 2 + "px")
+                .style("transform", `translateX(${margin.left}px)`);
+        })
         .on("mouseout", () => {
             // desaparece o card
             tooltip.transition().duration(200).style("opacity", 0);
