@@ -1,0 +1,44 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  :root {
+    --color1: #bc6c25;
+    --color2: #dda15e;
+    --color3: #fefae0;
+    --color4: #283618;
+    --color5: black;
+  }
+
+  body {
+    background-color: var(--color4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  .container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    width: 1000px;
+    height: 600px;
+    background-color: var(--color3);
+  }
+
+  #canvas {
+    border: 1px solid gray;
+    /*   width: 800px;
+    height: 500px; */
+  }
+
+  .bar {
+    fill: var(--color1);
+  }
+
+  .x-axis,
+  .y-axis {
+    color: var(--color5);
+  }
